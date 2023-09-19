@@ -12,6 +12,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './routes/Root'
 import Home from './routes/Home'
 import RecipeListPage from './routes/RecipeListPage'
+import RecipePage from './routes/RecipePage'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path: '/recipes',
         element: <RecipeListPage/>
+      },
+      {
+        path: '/recipe/:recipeId',
+        element: <RecipePage/>
       }
     ]
   }
