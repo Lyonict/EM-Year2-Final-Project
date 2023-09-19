@@ -1,5 +1,4 @@
 export default function RecipePage({data}) {
-  console.log(data)
   return(
     <section>
       <img src={data.photo} alt={data.titre} />
