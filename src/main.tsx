@@ -14,6 +14,7 @@ import ErrorPage from './routes/ErrorPage'
 import Home from './routes/Home'
 import RecipeListPage from './routes/RecipeListPage'
 import RecipePage from './routes/RecipePage'
+import AddRecipePage from './routes/AddRecipePage'
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: '/recipe/:recipeId',
         element: <RecipePage/>
+      },
+      {
+        path: '/addrecipe',
+        element: <AddRecipePage/>
       }
     ]
   }
