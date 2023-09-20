@@ -2,7 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 // Bootstrap
-import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
 // Store & redux
 import store from './app/store';
 import { Provider } from 'react-redux';
@@ -13,6 +14,7 @@ import ErrorPage from './routes/ErrorPage'
 import Home from './routes/Home'
 import RecipeListPage from './routes/RecipeListPage'
 import RecipePage from './routes/RecipePage'
+import AddRecipePage from './routes/AddRecipePage'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: '/recipe/:recipeId',
         element: <RecipePage/>
+      },
+      {
+        path: '/addrecipe',
+        element: <AddRecipePage/>
       }
     ]
   }
