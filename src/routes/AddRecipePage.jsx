@@ -1,4 +1,3 @@
-import { all } from "axios"
 import { useState } from "react"
 // Redux
 import { useDispatch } from "react-redux"
@@ -92,7 +91,7 @@ export default function AddRecipePage() {
           <Form.Control.Feedback type="invalid">Vous devez choisir une des options</Form.Control.Feedback>
         </FloatingLabel>
         {/* People */}
-        <FloatingLabel controlId="recipe-description" label="Pour combien de personnes" className="mb-3">
+        <FloatingLabel controlId="recipe-people" label="Pour combien de personnes" className="mb-3">
           <Form.Control type="number" required onChange={(e) => setPeople(e.target.value)}/>
           <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
         </FloatingLabel>
@@ -109,8 +108,8 @@ export default function AddRecipePage() {
           <Form.Control type="text" onChange={(e) => setImage(e.target.value)} />
         </FloatingLabel>
         {/* Ingredients */}
-        <Form.Label htmlFor="ingrediends">Ingredients</Form.Label>
-        <InputGroup className="w-100 mb-3">
+        <h5>Ingredients</h5>
+        <InputGroup controlId="recipe-ingredients" className="w-100 mb-3">
           <Row className="mx-0 w-100">
             <Col xs={"6"} className="px-0">
               <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
@@ -138,7 +137,7 @@ export default function AddRecipePage() {
           )
         })}
         {/* Steps */}
-        <Form.Label htmlFor="steps">Etapes</Form.Label>
+        <h5>Etapes</h5>
         <Form.Text className="text-muted d-block">Appuyez sur Entrer pour ajouter une étape</Form.Text>
         <InputGroup className="mb-3">
           <InputGroup.Text>{allSteps.length + 1}</InputGroup.Text>
