@@ -1,8 +1,15 @@
 import { all } from "axios"
 import { useState } from "react"
+// Redux
+import { useDispatch } from "react-redux"
+import { addRecipe } from "../features/recipeSlice"
+import { nanoid } from "@reduxjs/toolkit"
+// react-bootstrap
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
 
 export default function AddRecipePage() {
+  const dispatch = useDispatch()
+
   //Full recipe
   const [recipe, setRecipe] = useState(null)
   const [title, setTitle] = useState(null)
@@ -20,6 +27,7 @@ export default function AddRecipePage() {
   // Current step
   const [step, setStep] = useState(null)
 
+  // Form validation
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -38,11 +46,13 @@ export default function AddRecipePage() {
         etapes: allSteps,
         photo: image
       })
+      dispatch(addRecipe({id: nanoid(), ...recipe}))
     }
 
     setValidated(true);
   }
 
+  // Maps for ingredients and steps
   const handleIngredientAdd = (e) => {
     e.preventDefault()
     setIngredients([
@@ -50,7 +60,6 @@ export default function AddRecipePage() {
       [ingredientsName, ingredientsQuantity + ingredientsUnit]
     ])
   }
-
   const handleStepAdd = (e) => {
     if(e.keyCode === 13 && step != null) {
       e.preventDefault()
