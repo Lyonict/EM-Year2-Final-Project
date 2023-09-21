@@ -1,13 +1,13 @@
 import { useState } from "react"
 // Redux
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { addRecipe } from "../features/recipeSlice"
-import { nanoid } from "@reduxjs/toolkit"
 // react-bootstrap
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
 
 export default function AddRecipePage() {
   const dispatch = useDispatch()
+  const newId = useSelector((state) => state.recipes.value.length + 1)
 
   //Full recipe
   const [title, setTitle] = useState(null)
@@ -35,6 +35,7 @@ export default function AddRecipePage() {
     } else {
       console.log("Tout est conforme")
       const recipe = {
+        id: newId,
         titre: title,
         description: desc,
         niveau: level,
@@ -44,7 +45,7 @@ export default function AddRecipePage() {
         etapes: allSteps,
         photo: image
       }
-      dispatch(addRecipe({id: nanoid(), ...recipe}))
+      dispatch(addRecipe(recipe))
     }
 
     setValidated(true);
@@ -85,7 +86,7 @@ export default function AddRecipePage() {
             <option disabled value="">-- Choisissez un niveau --</option>
             <option value="padawan">Apprenti</option>
             <option value="jedi">Compagnon</option>
-            <option value="master">Maitre</option>
+            <option value="maitre">Maitre</option>
           </Form.Select>
           <Form.Control.Feedback type="invalid">Vous devez choisir une des options</Form.Control.Feedback>
         </FloatingLabel>
