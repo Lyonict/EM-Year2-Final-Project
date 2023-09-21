@@ -10,7 +10,6 @@ export default function AddRecipePage() {
   const dispatch = useDispatch()
 
   //Full recipe
-  const [recipe, setRecipe] = useState(null)
   const [title, setTitle] = useState(null)
   const [desc, setDesc] = useState(null)
   const [level, setLevel] = useState(null)
@@ -35,16 +34,16 @@ export default function AddRecipePage() {
       event.stopPropagation();
     } else {
       console.log("Tout est conforme")
-      setRecipe({
+      const recipe = {
         titre: title,
         description: desc,
         niveau: level,
         personnes: people,
-        tempsPrepattion: time,
+        tempsPreparation: time,
         ingredients: ingredients,
         etapes: allSteps,
         photo: image
-      })
+      }
       dispatch(addRecipe({id: nanoid(), ...recipe}))
     }
 
@@ -92,13 +91,13 @@ export default function AddRecipePage() {
         </FloatingLabel>
         {/* People */}
         <FloatingLabel controlId="recipe-people" label="Pour combien de personnes" className="mb-3">
-          <Form.Control type="number" required onChange={(e) => setPeople(e.target.value)}/>
+          <Form.Control type="number" required onChange={(e) => setPeople(Number(e.target.value))}/>
           <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
         </FloatingLabel>
         {/* Time */}
         <InputGroup hasValidation className="mb-3">
           <FloatingLabel controlId="recipe-time" label="Temps de préparation">
-            <Form.Control type="number" required onChange={(e) => setTime(e.target.value)} />
+            <Form.Control type="number" required onChange={(e) => setTime(Number(e.target.value))} />
           </FloatingLabel>
           <InputGroup.Text>minutes</InputGroup.Text>
           <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>

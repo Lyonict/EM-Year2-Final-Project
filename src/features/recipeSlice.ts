@@ -22,7 +22,12 @@ export const recipeSlice = createSlice({
   name: "recipes",
   initialState,
   reducers: {
-    addRecipe: (state, action) => {},
+    addRecipe: (state, action) => {
+      state.value.push(action.payload)
+      axios.post("http://localhost:9000/api/recipes", action.payload)
+      .then(response => console.log(response))
+      .catch(error => console.log(error))
+    },
     removeRecipe: (state, action) => {},
     modifyRecipe: (state, action) => {},
   },
