@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk,  } from "@reduxjs/toolkit";
 import axios from "axios";
+import type { Recipe } from "../types/recipes";
 
 type InitialState = {
-  value: object[],
+  value: Recipe[],
   status: "idle" | "loading" | "succeeded" | "failed",
   error: null | undefined | string
 }
@@ -30,7 +31,7 @@ export const recipeSlice = createSlice({
     },
     removeRecipe: (state, action) => {
       const recipeIndex = state.value.findIndex((recipe) => recipe.id === action.payload)
-      if(recipeIndex) {
+      if(recipeIndex > -1) {
         state.value.splice(recipeIndex, 1)
         axios.delete(`http://localhost:9000/api/recipe/${action.payload}`)
       }

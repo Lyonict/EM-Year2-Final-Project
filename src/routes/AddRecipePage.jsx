@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 // Redux
 import { useDispatch, useSelector } from "react-redux"
 import { addRecipe } from "../features/recipeSlice"
@@ -7,9 +7,10 @@ import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstr
 
 export default function AddRecipePage() {
   const dispatch = useDispatch()
-  const newId = useSelector((state) => state.recipes.value.length + 1)
+  const allRecipes = useSelector((state) => state.recipes.value)
 
   //Full recipe
+  const [newId, setNewId] = useState(null)
   const [title, setTitle] = useState(null)
   const [desc, setDesc] = useState(null)
   const [level, setLevel] = useState(null)
@@ -65,6 +66,16 @@ export default function AddRecipePage() {
       setAllSteps([...allSteps, step])
     }
   }
+
+  useEffect(() => {
+    return () => {
+      const lastRecipe = allRecipes[allRecipes.length-1]
+      if(lastRecipe) {
+        setNewId(lastRecipe.id+1)
+      }
+    }
+  })
+
 
   return(
     <section className="container">
