@@ -109,7 +109,7 @@ export default function AddRecipePage() {
         </FloatingLabel>
         {/* Ingredients */}
         <h5>Ingredients</h5>
-        <InputGroup controlId="recipe-ingredients" className="w-100 mb-3">
+        <InputGroup className="w-100 mb-3">
           <Row className="mx-0 w-100">
             <Col xs={"6"} className="px-0">
               <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
