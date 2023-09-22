@@ -1,17 +1,22 @@
 import { useState, useEffect } from "react";
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
+import { useDispatch, useSelector } from "react-redux";
+import { addRecipe } from "../features/recipeSlice";
 
 export default function RecipeForm({recipeData}) {
+  const dispatch = useDispatch()
+  const allRecipes = useSelector((state) => state.recipes.value)
+
     //Full recipe
-    const [recipeId, setRecipeId] = useState(null)
-    const [title, setTitle] = useState(null)
-    const [desc, setDesc] = useState(null)
-    const [level, setLevel] = useState(null)
-    const [people, setPeople] = useState(null)
-    const [time, setTime] = useState(null)
+    const [recipeId, setRecipeId] = useState("")
+    const [title, setTitle] = useState("")
+    const [desc, setDesc] = useState("")
+    const [level, setLevel] = useState("")
+    const [people, setPeople] = useState("")
+    const [time, setTime] = useState("")
     const [ingredients, setIngredients] = useState([])
     const [allSteps, setAllSteps] = useState([])
-    const [image, setImage] = useState(null)
+    const [image, setImage] = useState("")
     //Ingredients
     const [ingredientsName, setIngredientName] = useState('')
     const [ingredientsQuantity, setIngredientQuantity] = useState('')
@@ -38,6 +43,11 @@ export default function RecipeForm({recipeData}) {
           ingredients: ingredients,
           etapes: allSteps,
           photo: image
+        }
+        if(recipeData) {
+          console.log("modification")
+        } else {
+          dispatch(addRecipe(recipe))
         }
       }
 
@@ -71,17 +81,20 @@ export default function RecipeForm({recipeData}) {
         setIngredients(recipeData.ingredients)
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
+      } else {
+        const lastRecipe = allRecipes[allRecipes.length-1]
+        setRecipeId(lastRecipe.id+1)
       }
     }
   }, [recipeData])
 
   return(
-    <Form>
+    <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
       {/* Titre */}
       <FloatingLabel controlId="recipe-title" label="Titre de la recette" className="mb-3">
         <Form.Control
         type="text"
-        defaultValue={title}
+        value={title}
         required
         onChange={(e) => setTitle(e.target.value)} />
         <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
@@ -90,7 +103,7 @@ export default function RecipeForm({recipeData}) {
       <FloatingLabel controlId="recipe-description" label="Description" className="mb-3">
         <Form.Control
         type="text"
-        defaultValue={desc}
+        value={desc}
         required
         onChange={(e) => setDesc(e.target.value)} />
         <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
@@ -100,7 +113,7 @@ export default function RecipeForm({recipeData}) {
         <Form.Select
         type="text"
         aria-label="Niveau"
-        defaultValue={level}
+        value={level}
         required
         onChange={(e) => setLevel(e.target.value)}>
           <option disabled value="">-- Choisissez un niveau --</option>
@@ -115,7 +128,7 @@ export default function RecipeForm({recipeData}) {
         <Form.Control
         type="number"
         required
-        defaultValue={people}
+        value={people}
         onChange={(e) => setPeople(Number(e.target.value))}/>
         <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
@@ -125,7 +138,7 @@ export default function RecipeForm({recipeData}) {
           <Form.Control
           type="number"
           required
-          defaultValue={time}
+          value={time}
           onChange={(e) => setTime(Number(e.target.value))} />
         </FloatingLabel>
         <InputGroup.Text>minutes</InputGroup.Text>
@@ -135,7 +148,7 @@ export default function RecipeForm({recipeData}) {
       <FloatingLabel controlId="recipe-image" label="Image (optionel)" className="mb-3">
         <Form.Control
         type="text"
-        defaultValue={image}
+        value={image}
         onChange={(e) => setImage(e.target.value)} />
       </FloatingLabel>
       {/* Ingredients */}
