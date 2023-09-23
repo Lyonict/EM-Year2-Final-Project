@@ -18,11 +18,11 @@ export default function RecipeForm({recipeData}) {
     const [allSteps, setAllSteps] = useState([])
     const [image, setImage] = useState("")
     //Ingredients
-    const [ingredientsName, setIngredientName] = useState('')
-    const [ingredientsQuantity, setIngredientQuantity] = useState('')
-    const [ingredientsUnit, setIngredientUnit] = useState('')
+    const [ingredientsName, setIngredientName] = useState("")
+    const [ingredientsQuantity, setIngredientQuantity] = useState("")
+    const [ingredientsUnit, setIngredientUnit] = useState("")
     // Current step
-    const [step, setStep] = useState(null)
+    const [step, setStep] = useState("")
 
     // Form validation
     const [validated, setValidated] = useState(false)
