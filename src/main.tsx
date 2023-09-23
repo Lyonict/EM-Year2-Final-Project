@@ -15,6 +15,7 @@ import Home from './routes/Home'
 import RecipeListPage from './routes/RecipeListPage'
 import RecipePage from './routes/RecipePage'
 import AddRecipePage from './routes/AddRecipePage'
+import ModifyRecipePage from './routes/ModifyRecipePage'
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: '/addrecipe',
         element: <AddRecipePage/>
+      },
+      {
+        path: '/modifyrecipe/:recipeId',
+        element: <ModifyRecipePage/>
       }
     ]
   }
