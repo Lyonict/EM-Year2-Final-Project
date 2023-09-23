@@ -81,12 +81,12 @@ export default function RecipeForm({recipeData}) {
         setIngredients(recipeData.ingredients)
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
-      } else {
+      } else if(allRecipes.length) {
         const lastRecipe = allRecipes[allRecipes.length-1]
         setRecipeId(lastRecipe.id+1)
       }
     }
-  }, [recipeData])
+  }, [recipeData, allRecipes])
 
   return(
     <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
