@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux";
-import { addRecipe } from "../features/recipeSlice";
+import { addRecipe, modifyRecipe } from "../features/recipeSlice";
 
 export default function RecipeForm({recipeData}) {
   const dispatch = useDispatch()
@@ -45,7 +45,7 @@ export default function RecipeForm({recipeData}) {
           photo: image
         }
         if(recipeData) {
-          console.log("modification")
+          dispatch(modifyRecipe(recipe))
         } else {
           dispatch(addRecipe(recipe))
         }
@@ -157,7 +157,7 @@ export default function RecipeForm({recipeData}) {
         <Row className="mx-0 w-100">
           <Col xs={"6"} className="px-0">
             <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
-              <Form.Control type="text" required className="rounded-0 rounded-start" onChange={(e) => setIngredientName(e.target.value)}/>
+              <Form.Control type="text" className="rounded-0 rounded-start" onChange={(e) => setIngredientName(e.target.value)}/>
               <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
             </FloatingLabel>
           </Col>

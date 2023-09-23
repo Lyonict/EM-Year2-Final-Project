@@ -36,7 +36,13 @@ export const recipeSlice = createSlice({
         axios.delete(`http://localhost:9000/api/recipe/${action.payload}`)
       }
     },
-    modifyRecipe: (state, action) => {},
+    modifyRecipe: (state, action) => {
+      const recipeIndex = state.value.findIndex((recipe) => recipe.id === action.payload.id)
+      if(recipeIndex > -1) {
+        state.value.splice(recipeIndex, 1, action.payload)
+        axios.put(`http://localhost:9000/api/recipe/${action.payload.id}`, action.payload)
+      }
+    },
   },
   extraReducers(builder) {
     builder
