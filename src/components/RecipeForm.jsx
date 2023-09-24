@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux";
 import { addRecipe, modifyRecipe } from "../features/recipeSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 export default function RecipeForm({recipeData}) {
   const dispatch = useDispatch()
@@ -28,7 +30,7 @@ export default function RecipeForm({recipeData}) {
     const handleSubmit = (event) => {
       event.preventDefault();
       const form = event.currentTarget;
-      if (form.checkValidity() === false) {
+      if (form.checkValidity() === false ) {
         event.stopPropagation();
       } else {
         console.log("Tout est conforme")
@@ -89,6 +91,12 @@ export default function RecipeForm({recipeData}) {
       newArray.splice(index, 1, newIngredient)
       setIngredients(newArray)
     }
+  }
+
+  const handleDeleteFromState = (e, index, state, setState) => {
+    const newArray = [...state]
+    newArray.splice(index, 1)
+    setState(newArray)
   }
 
   useEffect(() => {
@@ -196,16 +204,21 @@ export default function RecipeForm({recipeData}) {
         return(
           <InputGroup key={index} className="w-100 mb-3">
             <Row className="mx-0 w-100">
-              <Col xs={"8"} className="px-0">
+              <Col xs={"7"} className="px-0">
                 <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
                   <Form.Control type="text" value={ingredient[0]} className="rounded-0 rounded-start" onChange={(e) => handleIngredientModify(e, index, 0)}/>
                   <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
                 </FloatingLabel>
               </Col>
-              <Col className="px-0">
+              <Col xs={"4"} className="px-0">
                 <FloatingLabel controlId="recipe-ingredient-quantity" label="Quantité (optionel)">
                   <Form.Control type="text" value={ingredient[1]} className="rounded-0 rounded-end" onChange={(e) => handleIngredientModify(e, index, 1)} />
                 </FloatingLabel>
+              </Col>
+              <Col xs={"1"} className="d-flex align-items-center">
+                <Button variant="danger" onClick={(e) => handleDeleteFromState(e, index, ingredients, setIngredients)}>
+                  <FontAwesomeIcon icon={faTrash}/>
+                </Button>
               </Col>
             </Row>
           </InputGroup>
@@ -224,7 +237,10 @@ export default function RecipeForm({recipeData}) {
           return(
             <InputGroup key={index} className="mb-3">
               <InputGroup.Text>{index + 1}</InputGroup.Text>
-              <Form.Control as={"textarea"} value={step} onChange={(e) => handleStepModify(e, index)} />
+              <Form.Control as={"textarea"} value={step} className="pe-4" onChange={(e) => handleStepModify(e, index)} />
+              <Button variant="danger" onClick={(e) => handleDeleteFromState(e, index, allSteps, setAllSteps)}>
+                <FontAwesomeIcon icon={faTrash}/>
+              </Button>
             </InputGroup>
           )})}
         </div>
