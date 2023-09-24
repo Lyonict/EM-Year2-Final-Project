@@ -68,6 +68,29 @@ export default function RecipeForm({recipeData}) {
     }
   }
 
+  const handleStepModify = (e, index) => {
+    if(e.target.value != "") {
+      e.preventDefault()
+      const newArray = [...allSteps]
+      newArray.splice(index, 1, e.target.value)
+      setAllSteps(newArray)
+    }
+  }
+
+  const handleIngredientModify = (e, index, field) => {
+    // Index of each inside the array, for reference purposes
+    // ingredient = 0
+    // quantity = 1
+    if(field === 1 || e.target.value != "") {
+      e.preventDefault()
+      const newArray = [...ingredients]
+      const newIngredient = [...newArray[index]]
+      newIngredient.splice(field, 1, e.target.value)
+      newArray.splice(index, 1, newIngredient)
+      setIngredients(newArray)
+    }
+  }
+
   useEffect(() => {
     return () => {
       if(recipeData) {
@@ -171,7 +194,21 @@ export default function RecipeForm({recipeData}) {
       {ingredients &&
       ingredients.map((ingredient, index) => {
         return(
-          <p key={index}>{`${ingredient[0]} ${ingredient[1] != '' ? ` - ${ingredient[1]}` : ""}`}</p>
+          <InputGroup key={index} className="w-100 mb-3">
+            <Row className="mx-0 w-100">
+              <Col xs={"8"} className="px-0">
+                <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
+                  <Form.Control type="text" value={ingredient[0]} className="rounded-0 rounded-start" onChange={(e) => handleIngredientModify(e, index, 0)}/>
+                  <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
+                </FloatingLabel>
+              </Col>
+              <Col className="px-0">
+                <FloatingLabel controlId="recipe-ingredient-quantity" label="Quantité (optionel)">
+                  <Form.Control type="text" value={ingredient[1]} className="rounded-0 rounded-end" onChange={(e) => handleIngredientModify(e, index, 1)} />
+                </FloatingLabel>
+              </Col>
+            </Row>
+          </InputGroup>
         )
       })}
       {/* Steps */}
@@ -179,15 +216,16 @@ export default function RecipeForm({recipeData}) {
       <Form.Text className="text-muted d-block">Appuyez sur Entrer pour ajouter une étape</Form.Text>
       <InputGroup className="mb-3">
         <InputGroup.Text>{allSteps.length + 1}</InputGroup.Text>
-        <FloatingLabel controlId="recipe-step-add" label="Etape">
-          <Form.Control as={"textarea"} onChange={(e) => setStep(e.target.value)} onKeyDown={(e) => handleStepAdd(e)}/>
-        </FloatingLabel>
+        <Form.Control as={"textarea"} onChange={(e) => setStep(e.target.value)} onKeyDown={(e) => handleStepAdd(e)}/>
       </InputGroup>
       {allSteps &&
         <div className="d-flex flex-column-reverse">
           {allSteps.map((step, index) => {
           return(
-            <p key={index + 1}>{index + 1} - {step}</p>
+            <InputGroup key={index} className="mb-3">
+              <InputGroup.Text>{index + 1}</InputGroup.Text>
+              <Form.Control as={"textarea"} value={step} onChange={(e) => handleStepModify(e, index)} />
+            </InputGroup>
           )})}
         </div>
       }
