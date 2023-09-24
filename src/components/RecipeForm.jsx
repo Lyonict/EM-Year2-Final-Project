@@ -20,7 +20,6 @@ export default function RecipeForm({recipeData}) {
     //Ingredients
     const [ingredientsName, setIngredientName] = useState("")
     const [ingredientsQuantity, setIngredientQuantity] = useState("")
-    const [ingredientsUnit, setIngredientUnit] = useState("")
     // Current step
     const [step, setStep] = useState("")
 
@@ -59,7 +58,7 @@ export default function RecipeForm({recipeData}) {
     e.preventDefault()
     setIngredients([
       ...ingredients,
-      [ingredientsName, ingredientsQuantity + ingredientsUnit]
+      [ingredientsName, ingredientsQuantity]
     ])
   }
   const handleStepAdd = (e) => {
@@ -155,7 +154,7 @@ export default function RecipeForm({recipeData}) {
       <h5>Ingredients</h5>
       <InputGroup className="w-100 mb-3">
         <Row className="mx-0 w-100">
-          <Col xs={"6"} className="px-0">
+          <Col xs={"8"} className="px-0">
             <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
               <Form.Control type="text" className="rounded-0 rounded-start" onChange={(e) => setIngredientName(e.target.value)}/>
               <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
@@ -163,12 +162,7 @@ export default function RecipeForm({recipeData}) {
           </Col>
           <Col className="px-0">
             <FloatingLabel controlId="recipe-ingredient-quantity" label="Quantité (optionel)">
-              <Form.Control type="number" className="rounded-0" onChange={(e) => setIngredientQuantity(String(e.target.value))}/>
-            </FloatingLabel>
-          </Col>
-          <Col className="px-0">
-            <FloatingLabel controlId="recipe-ingredient-unit" label="Unité (optionel)">
-              <Form.Control type="text" className="rounded-0 rounded-end" onChange={(e) => setIngredientUnit(e.target.value)}/>
+              <Form.Control type="text" className="rounded-0 rounded-end" onChange={(e) => setIngredientQuantity(String(e.target.value))}/>
             </FloatingLabel>
           </Col>
         </Row>
