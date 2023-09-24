@@ -18,11 +18,11 @@ export default function RecipeForm({recipeData}) {
     const [allSteps, setAllSteps] = useState([])
     const [image, setImage] = useState("")
     //Ingredients
-    const [ingredientsName, setIngredientName] = useState('')
-    const [ingredientsQuantity, setIngredientQuantity] = useState('')
-    const [ingredientsUnit, setIngredientUnit] = useState('')
+    const [ingredientsName, setIngredientName] = useState("")
+    const [ingredientsQuantity, setIngredientQuantity] = useState("")
+    const [ingredientsUnit, setIngredientUnit] = useState("")
     // Current step
-    const [step, setStep] = useState(null)
+    const [step, setStep] = useState("")
 
     // Form validation
     const [validated, setValidated] = useState(false)
@@ -81,12 +81,12 @@ export default function RecipeForm({recipeData}) {
         setIngredients(recipeData.ingredients)
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
-      } else {
+      } else if(allRecipes.length) {
         const lastRecipe = allRecipes[allRecipes.length-1]
         setRecipeId(lastRecipe.id+1)
       }
     }
-  }, [recipeData])
+  }, [recipeData, allRecipes])
 
   return(
     <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
