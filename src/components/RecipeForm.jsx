@@ -24,18 +24,25 @@ export default function RecipeForm({recipeData}) {
   const [ingredientsQuantity, setIngredientQuantity] = useState("")
   // Current step
   const [step, setStep] = useState("")
+  // Ingredients & steps validation
+  const [ingredientValidation, setIngredientValidation] = useState(false)
+  const [stepsValidation, setStepsValidation] = useState(false)
 
   // Form validation
   const [validated, setValidated] = useState(false)
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.currentTarget;
-    checkSpecialFieldsValidation()
-    if (form.checkValidity() === false || !allSteps.length || !ingredients.length ) {
-      console.log("Formulaire non conforme")
+    if (form.checkValidity() === false || !ingredients.length || !allSteps.length ) {
+      // We show the validation error messages for ingredients & steps (if necessary)
+      if(!ingredients.length) {
+        setIngredientValidation(true)
+      }
+      if(!allSteps.length) {
+        setStepsValidation(true)
+      }
       event.stopPropagation();
     } else {
-      console.log("Tout est conforme")
       const recipe = {
         titre: title,
         description: desc,
@@ -57,37 +64,6 @@ export default function RecipeForm({recipeData}) {
     setValidated(true);
   }
 
-  // Because of the way the ingredients and steps fields need to be done, we can't use bootstrap default validation. So we do our own
-  // This validation is when we submit the form : it checks for both
-  const checkSpecialFieldsValidation = () => {
-    checkStepsValidation()
-    checkIngredientsValidation()
-  }
-
-  // This validation if for the ingredients alone : it is used when we delete an ingredient, so the message appear when we deleted all ingredients
-  const checkIngredientsValidation = () => {
-    const feedbackIngredients = document.querySelector('#form-control-feedback-ingredients')
-    if(feedbackIngredients) {
-      if(!ingredients.length) {
-        feedbackIngredients.style.display = "block"
-      } else {
-        feedbackIngredients.style.display = "none"
-      }
-    }
-  }
-
-  // Same as above, but for steps
-  const checkStepsValidation = () => {
-    const feedbackSteps = document.querySelector('#form-control-feedback-steps')
-    if(feedbackSteps) {
-      if(!allSteps.length) {
-        feedbackSteps.style.display = "block"
-      } else {
-        feedbackSteps.style.display = "none"
-      }
-    }
-  }
-
   // Maps for ingredients and steps
   const handleIngredientAdd = (e) => {
     e.preventDefault()
@@ -95,11 +71,15 @@ export default function RecipeForm({recipeData}) {
       ...ingredients,
       [ingredientsName, ingredientsQuantity]
     ])
+    // We also remove the error message for this field (if it's here)
+    setIngredientValidation(false)
   }
   const handleStepAdd = (e) => {
     if(e.keyCode === 13 && step != null) {
       e.preventDefault()
       setAllSteps([...allSteps, step])
+      // We also remove the error message for this field (if it's here)
+      setStepsValidation(false)
     }
   }
 
@@ -130,12 +110,18 @@ export default function RecipeForm({recipeData}) {
     const newArray = [...ingredients]
     newArray.splice(index, 1)
     setIngredients(newArray)
+    if (!newArray.length && validated || !newArray.length && recipeData) {
+      setIngredientValidation(true)
+    }
   }
 
   const handleStepDelete = (e, index) => {
     const newArray = [...allSteps]
     newArray.splice(index, 1)
     setAllSteps(newArray)
+    if (!newArray.length && validated || !newArray.length && recipeData) {
+      setStepsValidation(true)
+    }
   }
 
   useEffect(() => {
@@ -150,13 +136,8 @@ export default function RecipeForm({recipeData}) {
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
       }
-      if(initialRender === false) {
-        checkIngredientsValidation()
-        checkStepsValidation()
-      }
-      setInitialRender(false)
     }
-  }, [recipeData, allRecipes, ingredients, allSteps])
+  }, [recipeData])
 
   return(
     <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
@@ -258,7 +239,7 @@ export default function RecipeForm({recipeData}) {
           </InputGroup>
         )
       })}
-      <Form.Control.Feedback className="mb-3" id="form-control-feedback-ingredients" type="invalid">Vous devez ajouter au moins un ingrédient</Form.Control.Feedback>
+      {ingredientValidation && <Form.Control.Feedback className="mb-3 d-block" type="invalid">Vous devez ajouter au moins un ingrédient</Form.Control.Feedback>}
       {/* Steps */}
       <h5>Etapes</h5>
       <Form.Text className="text-muted d-block">Appuyez sur Entrer pour ajouter une étape</Form.Text>
@@ -280,7 +261,7 @@ export default function RecipeForm({recipeData}) {
           )})}
         </div>
       }
-      <Form.Control.Feedback className="mb-3" id="form-control-feedback-steps" type="invalid">Vous devez ajouter au moins une étape</Form.Control.Feedback>
+      {stepsValidation && <Form.Control.Feedback className="mb-3 d-block" type="invalid">Vous devez ajouter au moins une étape</Form.Control.Feedback>}
       <button type="submit" className="btn btn-primary">Submit test</button>
     </Form>
   )
