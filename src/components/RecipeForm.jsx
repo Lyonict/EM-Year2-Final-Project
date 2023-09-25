@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addRecipe, modifyRecipe } from "../features/recipeSlice";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 export default function RecipeForm({recipeData}) {
   const dispatch = useDispatch()
-  const allRecipes = useSelector((state) => state.recipes.value)
-  const [initialRender, setInitialRender] = useState(true)
 
   //Full recipe
   const [title, setTitle] = useState("")

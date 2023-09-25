@@ -13,9 +13,9 @@ export default function Header() {
             <Nav.Item as={"li"} className="me-2">
               <Link to={"/addrecipe"}>Add recipe</Link>
             </Nav.Item>
-            <Nav.Item as={"li"}>
+            {/* <Nav.Item as={"li"}>
               <Link to={"/recipes"}>Recipe List</Link>
-            </Nav.Item>
+            </Nav.Item> */}
           </Nav>
         </Container>
       </Navbar>

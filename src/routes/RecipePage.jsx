@@ -7,7 +7,6 @@ export default function RecipeListPage() {
   const {data:recipe, error} = useFetch(url)
   return(
     <>
-      <p>This is the single recipe page</p>
       {/* Loading display */}
       {!recipe && !error &&
       // TODO: display skeletton cards

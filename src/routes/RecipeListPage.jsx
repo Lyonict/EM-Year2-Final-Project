@@ -8,7 +8,6 @@ export default function RecipeListPage() {
 
   return (
     <>
-      <p>This is the recipe list page</p>
       {/* Loading display */}
       {status === "loading" && (
         // TODO: display skeletton cards

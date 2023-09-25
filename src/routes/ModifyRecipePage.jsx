@@ -16,8 +16,7 @@ export default function ModifyRecipePage() {
 
       {/* Success display */}
       {recipeToModify &&
-      <h2>This is the recipe</h2>}
-      <RecipeForm recipeData={recipeToModify}/>
+      <RecipeForm recipeData={recipeToModify}/>}
       {/* Error display */}
     </section>
   )

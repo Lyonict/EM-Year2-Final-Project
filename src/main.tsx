@@ -11,7 +11,7 @@ import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Root from './routes/Root'
 import ErrorPage from './routes/ErrorPage'
-import Home from './routes/Home'
+// import Home from './routes/Home'
 import RecipeListPage from './routes/RecipeListPage'
 import RecipePage from './routes/RecipePage'
 import AddRecipePage from './routes/AddRecipePage'
@@ -25,12 +25,12 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home/>
-      },
-      {
-        path: '/recipes',
         element: <RecipeListPage/>
       },
+      // {
+      //   path: '/recipes',
+      //   element: <RecipeListPage/>
+      // },
       {
         path: '/recipe/:recipeId',
         element: <RecipePage/>
