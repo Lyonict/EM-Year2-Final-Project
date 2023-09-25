@@ -46,7 +46,7 @@ export default function RecipeForm({recipeData}) {
         tempsPreparation: time,
         ingredients: ingredients,
         etapes: allSteps,
-        photo: image
+        photo: image || "https://media.istockphoto.com/id/1156391956/fr/vectoriel/creative-chef-hat-symbol-text-font-letter-vector-design-illustration.jpg?s=612x612&w=0&k=20&c=OW3VQkFwTASi-RwfpEE3KatO4-JpmD7ANDwU64ufFEA="
       }
       if(recipeData) {
         dispatch(modifyRecipe(recipe))
