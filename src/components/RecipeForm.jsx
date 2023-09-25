@@ -11,7 +11,6 @@ export default function RecipeForm({recipeData}) {
   const [initialRender, setInitialRender] = useState(true)
 
   //Full recipe
-  const [recipeId, setRecipeId] = useState("")
   const [title, setTitle] = useState("")
   const [desc, setDesc] = useState("")
   const [level, setLevel] = useState("")
@@ -38,7 +37,6 @@ export default function RecipeForm({recipeData}) {
     } else {
       console.log("Tout est conforme")
       const recipe = {
-        id: recipeId,
         titre: title,
         description: desc,
         niveau: level,
@@ -49,7 +47,8 @@ export default function RecipeForm({recipeData}) {
         photo: image || "https://media.istockphoto.com/id/1156391956/fr/vectoriel/creative-chef-hat-symbol-text-font-letter-vector-design-illustration.jpg?s=612x612&w=0&k=20&c=OW3VQkFwTASi-RwfpEE3KatO4-JpmD7ANDwU64ufFEA="
       }
       if(recipeData) {
-        dispatch(modifyRecipe(recipe))
+        recipe.id = recipeData.id
+        dispatch(modifyRecipe(recipe, recipeData.id))
       } else {
         dispatch(addRecipe(recipe))
       }
@@ -142,7 +141,6 @@ export default function RecipeForm({recipeData}) {
   useEffect(() => {
     return () => {
       if(recipeData) {
-        setRecipeId(recipeData.id)
         setTitle(recipeData.titre)
         setDesc(recipeData.description)
         setLevel(recipeData.niveau)
@@ -151,9 +149,6 @@ export default function RecipeForm({recipeData}) {
         setIngredients(recipeData.ingredients)
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
-      } else if(allRecipes.length) {
-        const lastRecipe = allRecipes[allRecipes.length-1]
-        setRecipeId(lastRecipe.id+1)
       }
       if(initialRender === false) {
         checkIngredientsValidation()

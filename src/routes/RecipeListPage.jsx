@@ -5,6 +5,7 @@ export default function RecipeListPage() {
   const recipes = useSelector((state) => state.recipes.value);
   const error = useSelector((state) => state.recipes.error);
   const status = useSelector((state) => state.recipes.status);
+
   return (
     <>
       <p>This is the recipe list page</p>
