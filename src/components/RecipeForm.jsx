@@ -8,52 +8,86 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons'
 export default function RecipeForm({recipeData}) {
   const dispatch = useDispatch()
   const allRecipes = useSelector((state) => state.recipes.value)
+  const [initialRender, setInitialRender] = useState(true)
 
-    //Full recipe
-    const [recipeId, setRecipeId] = useState("")
-    const [title, setTitle] = useState("")
-    const [desc, setDesc] = useState("")
-    const [level, setLevel] = useState("")
-    const [people, setPeople] = useState("")
-    const [time, setTime] = useState("")
-    const [ingredients, setIngredients] = useState([])
-    const [allSteps, setAllSteps] = useState([])
-    const [image, setImage] = useState("")
-    //Ingredients
-    const [ingredientsName, setIngredientName] = useState("")
-    const [ingredientsQuantity, setIngredientQuantity] = useState("")
-    // Current step
-    const [step, setStep] = useState("")
+  //Full recipe
+  const [recipeId, setRecipeId] = useState("")
+  const [title, setTitle] = useState("")
+  const [desc, setDesc] = useState("")
+  const [level, setLevel] = useState("")
+  const [people, setPeople] = useState("")
+  const [time, setTime] = useState("")
+  const [ingredients, setIngredients] = useState([])
+  const [allSteps, setAllSteps] = useState([])
+  const [image, setImage] = useState("")
+  //Ingredients
+  const [ingredientsName, setIngredientName] = useState("")
+  const [ingredientsQuantity, setIngredientQuantity] = useState("")
+  // Current step
+  const [step, setStep] = useState("")
 
-    // Form validation
-    const [validated, setValidated] = useState(false)
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      if (form.checkValidity() === false ) {
-        event.stopPropagation();
-      } else {
-        console.log("Tout est conforme")
-        const recipe = {
-          id: recipeId,
-          titre: title,
-          description: desc,
-          niveau: level,
-          personnes: people,
-          tempsPreparation: time,
-          ingredients: ingredients,
-          etapes: allSteps,
-          photo: image
-        }
-        if(recipeData) {
-          dispatch(modifyRecipe(recipe))
-        } else {
-          dispatch(addRecipe(recipe))
-        }
+  // Form validation
+  const [validated, setValidated] = useState(false)
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    checkSpecialFieldsValidation()
+    if (form.checkValidity() === false || !allSteps.length || !ingredients.length ) {
+      console.log("Formulaire non conforme")
+      event.stopPropagation();
+    } else {
+      console.log("Tout est conforme")
+      const recipe = {
+        id: recipeId,
+        titre: title,
+        description: desc,
+        niveau: level,
+        personnes: people,
+        tempsPreparation: time,
+        ingredients: ingredients,
+        etapes: allSteps,
+        photo: image
       }
-
-      setValidated(true);
+      if(recipeData) {
+        dispatch(modifyRecipe(recipe))
+      } else {
+        dispatch(addRecipe(recipe))
+      }
     }
+
+    setValidated(true);
+  }
+
+  // Because of the way the ingredients and steps fields need to be done, we can't use bootstrap default validation. So we do our own
+  // This validation is when we submit the form : it checks for both
+  const checkSpecialFieldsValidation = () => {
+    checkStepsValidation()
+    checkIngredientsValidation()
+  }
+
+  // This validation if for the ingredients alone : it is used when we delete an ingredient, so the message appear when we deleted all ingredients
+  const checkIngredientsValidation = () => {
+    const feedbackIngredients = document.querySelector('#form-control-feedback-ingredients')
+    if(feedbackIngredients) {
+      if(!ingredients.length) {
+        feedbackIngredients.style.display = "block"
+      } else {
+        feedbackIngredients.style.display = "none"
+      }
+    }
+  }
+
+  // Same as above, but for steps
+  const checkStepsValidation = () => {
+    const feedbackSteps = document.querySelector('#form-control-feedback-steps')
+    if(feedbackSteps) {
+      if(!allSteps.length) {
+        feedbackSteps.style.display = "block"
+      } else {
+        feedbackSteps.style.display = "none"
+      }
+    }
+  }
 
   // Maps for ingredients and steps
   const handleIngredientAdd = (e) => {
@@ -67,15 +101,6 @@ export default function RecipeForm({recipeData}) {
     if(e.keyCode === 13 && step != null) {
       e.preventDefault()
       setAllSteps([...allSteps, step])
-    }
-  }
-
-  const handleStepModify = (e, index) => {
-    if(e.target.value != "") {
-      e.preventDefault()
-      const newArray = [...allSteps]
-      newArray.splice(index, 1, e.target.value)
-      setAllSteps(newArray)
     }
   }
 
@@ -93,10 +118,25 @@ export default function RecipeForm({recipeData}) {
     }
   }
 
-  const handleDeleteFromState = (e, index, state, setState) => {
-    const newArray = [...state]
+  const handleStepModify = (e, index) => {
+    if(e.target.value != "") {
+      e.preventDefault()
+      const newArray = [...allSteps]
+      newArray.splice(index, 1, e.target.value)
+      setAllSteps(newArray)
+    }
+  }
+
+  const handleIngredientDelete = (e, index) => {
+    const newArray = [...ingredients]
     newArray.splice(index, 1)
-    setState(newArray)
+    setIngredients(newArray)
+  }
+
+  const handleStepDelete = (e, index) => {
+    const newArray = [...allSteps]
+    newArray.splice(index, 1)
+    setAllSteps(newArray)
   }
 
   useEffect(() => {
@@ -115,8 +155,13 @@ export default function RecipeForm({recipeData}) {
         const lastRecipe = allRecipes[allRecipes.length-1]
         setRecipeId(lastRecipe.id+1)
       }
+      if(initialRender === false) {
+        checkIngredientsValidation()
+        checkStepsValidation()
+      }
+      setInitialRender(false)
     }
-  }, [recipeData, allRecipes])
+  }, [recipeData, allRecipes, ingredients, allSteps])
 
   return(
     <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
@@ -127,7 +172,6 @@ export default function RecipeForm({recipeData}) {
         value={title}
         required
         onChange={(e) => setTitle(e.target.value)} />
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Description */}
       <FloatingLabel controlId="recipe-description" label="Description" className="mb-3">
@@ -136,7 +180,6 @@ export default function RecipeForm({recipeData}) {
         value={desc}
         required
         onChange={(e) => setDesc(e.target.value)} />
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Level */}
       <FloatingLabel controlId="recipe-level" label="Niveau" className="mb-3">
@@ -151,7 +194,6 @@ export default function RecipeForm({recipeData}) {
           <option value="jedi">Compagnon</option>
           <option value="maitre">Maitre</option>
         </Form.Select>
-        <Form.Control.Feedback type="invalid">Vous devez choisir une des options</Form.Control.Feedback>
       </FloatingLabel>
       {/* People */}
       <FloatingLabel controlId="recipe-people" label="Pour combien de personnes" className="mb-3">
@@ -160,7 +202,6 @@ export default function RecipeForm({recipeData}) {
         required
         value={people}
         onChange={(e) => setPeople(Number(e.target.value))}/>
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Time */}
       <InputGroup hasValidation className="mb-3">
@@ -169,10 +210,10 @@ export default function RecipeForm({recipeData}) {
           type="number"
           required
           value={time}
+          className="rounded-0 rounded-start"
           onChange={(e) => setTime(Number(e.target.value))} />
         </FloatingLabel>
         <InputGroup.Text>minutes</InputGroup.Text>
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </InputGroup>
       {/* Image */}
       <FloatingLabel controlId="recipe-image" label="Image (optionel)" className="mb-3">
@@ -188,7 +229,6 @@ export default function RecipeForm({recipeData}) {
           <Col xs={"8"} className="px-0">
             <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
               <Form.Control type="text" className="rounded-0 rounded-start" onChange={(e) => setIngredientName(e.target.value)}/>
-              <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
             </FloatingLabel>
           </Col>
           <Col className="px-0">
@@ -205,18 +245,17 @@ export default function RecipeForm({recipeData}) {
           <InputGroup key={index} className="w-100 mb-3">
             <Row className="mx-0 w-100">
               <Col xs={"7"} className="px-0">
-                <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
+                <FloatingLabel controlId={`recipe-ingredient-name-${index+1}`} label="Ingredient">
                   <Form.Control type="text" value={ingredient[0]} className="rounded-0 rounded-start" onChange={(e) => handleIngredientModify(e, index, 0)}/>
-                  <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
                 </FloatingLabel>
               </Col>
               <Col xs={"4"} className="px-0">
-                <FloatingLabel controlId="recipe-ingredient-quantity" label="Quantité (optionel)">
+                <FloatingLabel controlId={`recipe-ingredient-quantity-${index+1}`} label="Quantité (optionel)">
                   <Form.Control type="text" value={ingredient[1]} className="rounded-0 rounded-end" onChange={(e) => handleIngredientModify(e, index, 1)} />
                 </FloatingLabel>
               </Col>
               <Col xs={"1"} className="d-flex align-items-center">
-                <Button variant="danger" onClick={(e) => handleDeleteFromState(e, index, ingredients, setIngredients)}>
+                <Button variant="danger" onClick={(e) => handleIngredientDelete(e, index)}>
                   <FontAwesomeIcon icon={faTrash}/>
                 </Button>
               </Col>
@@ -224,6 +263,7 @@ export default function RecipeForm({recipeData}) {
           </InputGroup>
         )
       })}
+      <Form.Control.Feedback className="mb-3" id="form-control-feedback-ingredients" type="invalid">Vous devez ajouter au moins un ingrédient</Form.Control.Feedback>
       {/* Steps */}
       <h5>Etapes</h5>
       <Form.Text className="text-muted d-block">Appuyez sur Entrer pour ajouter une étape</Form.Text>
@@ -238,13 +278,14 @@ export default function RecipeForm({recipeData}) {
             <InputGroup key={index} className="mb-3">
               <InputGroup.Text>{index + 1}</InputGroup.Text>
               <Form.Control as={"textarea"} value={step} className="pe-4" onChange={(e) => handleStepModify(e, index)} />
-              <Button variant="danger" onClick={(e) => handleDeleteFromState(e, index, allSteps, setAllSteps)}>
+              <Button variant="danger" onClick={(e) => handleStepDelete(e, index)}>
                 <FontAwesomeIcon icon={faTrash}/>
               </Button>
             </InputGroup>
           )})}
         </div>
       }
+      <Form.Control.Feedback className="mb-3" id="form-control-feedback-steps" type="invalid">Vous devez ajouter au moins une étape</Form.Control.Feedback>
       <button type="submit" className="btn btn-primary">Submit test</button>
     </Form>
   )
