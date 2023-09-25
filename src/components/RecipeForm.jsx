@@ -2,77 +2,131 @@ import { useState, useEffect } from "react";
 import { Form, FloatingLabel, InputGroup, Row, Col, Button } from "react-bootstrap"
 import { useDispatch, useSelector } from "react-redux";
 import { addRecipe, modifyRecipe } from "../features/recipeSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 export default function RecipeForm({recipeData}) {
   const dispatch = useDispatch()
   const allRecipes = useSelector((state) => state.recipes.value)
+  const [initialRender, setInitialRender] = useState(true)
 
-    //Full recipe
-    const [recipeId, setRecipeId] = useState("")
-    const [title, setTitle] = useState("")
-    const [desc, setDesc] = useState("")
-    const [level, setLevel] = useState("")
-    const [people, setPeople] = useState("")
-    const [time, setTime] = useState("")
-    const [ingredients, setIngredients] = useState([])
-    const [allSteps, setAllSteps] = useState([])
-    const [image, setImage] = useState("")
-    //Ingredients
-    const [ingredientsName, setIngredientName] = useState("")
-    const [ingredientsQuantity, setIngredientQuantity] = useState("")
-    const [ingredientsUnit, setIngredientUnit] = useState("")
-    // Current step
-    const [step, setStep] = useState("")
+  //Full recipe
+  const [title, setTitle] = useState("")
+  const [desc, setDesc] = useState("")
+  const [level, setLevel] = useState("")
+  const [people, setPeople] = useState("")
+  const [time, setTime] = useState("")
+  const [ingredients, setIngredients] = useState([])
+  const [allSteps, setAllSteps] = useState([])
+  const [image, setImage] = useState("")
+  //Ingredients
+  const [ingredientsName, setIngredientName] = useState("")
+  const [ingredientsQuantity, setIngredientQuantity] = useState("")
+  // Current step
+  const [step, setStep] = useState("")
+  // Ingredients & steps validation
+  const [ingredientValidation, setIngredientValidation] = useState(false)
+  const [stepsValidation, setStepsValidation] = useState(false)
 
-    // Form validation
-    const [validated, setValidated] = useState(false)
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const form = event.currentTarget;
-      if (form.checkValidity() === false) {
-        event.stopPropagation();
-      } else {
-        console.log("Tout est conforme")
-        const recipe = {
-          id: recipeId,
-          titre: title,
-          description: desc,
-          niveau: level,
-          personnes: people,
-          tempsPreparation: time,
-          ingredients: ingredients,
-          etapes: allSteps,
-          photo: image
-        }
-        if(recipeData) {
-          dispatch(modifyRecipe(recipe))
-        } else {
-          dispatch(addRecipe(recipe))
-        }
+  // Form validation
+  const [validated, setValidated] = useState(false)
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false || !ingredients.length || !allSteps.length ) {
+      // We show the validation error messages for ingredients & steps (if necessary)
+      if(!ingredients.length) {
+        setIngredientValidation(true)
       }
-
-      setValidated(true);
+      if(!allSteps.length) {
+        setStepsValidation(true)
+      }
+      event.stopPropagation();
+    } else {
+      const recipe = {
+        titre: title,
+        description: desc,
+        niveau: level,
+        personnes: people,
+        tempsPreparation: time,
+        ingredients: ingredients,
+        etapes: allSteps,
+        photo: image || "https://media.istockphoto.com/id/1156391956/fr/vectoriel/creative-chef-hat-symbol-text-font-letter-vector-design-illustration.jpg?s=612x612&w=0&k=20&c=OW3VQkFwTASi-RwfpEE3KatO4-JpmD7ANDwU64ufFEA="
+      }
+      if(recipeData) {
+        recipe.id = recipeData.id
+        dispatch(modifyRecipe(recipe, recipeData.id))
+      } else {
+        dispatch(addRecipe(recipe))
+      }
     }
+
+    setValidated(true);
+  }
 
   // Maps for ingredients and steps
   const handleIngredientAdd = (e) => {
     e.preventDefault()
     setIngredients([
       ...ingredients,
-      [ingredientsName, ingredientsQuantity + ingredientsUnit]
+      [ingredientsName, ingredientsQuantity]
     ])
+    // We also remove the error message for this field (if it's here)
+    setIngredientValidation(false)
   }
   const handleStepAdd = (e) => {
     if(e.keyCode === 13 && step != null) {
       e.preventDefault()
       setAllSteps([...allSteps, step])
+      // We also remove the error message for this field (if it's here)
+      setStepsValidation(false)
+    }
+  }
+
+  const handleIngredientModify = (e, index, field) => {
+    // Index of each inside the array, for reference purposes
+    // ingredient = 0
+    // quantity = 1
+    if(field === 1 || e.target.value != "") {
+      e.preventDefault()
+      const newArray = [...ingredients]
+      const newIngredient = [...newArray[index]]
+      newIngredient.splice(field, 1, e.target.value)
+      newArray.splice(index, 1, newIngredient)
+      setIngredients(newArray)
+    }
+  }
+
+  const handleStepModify = (e, index) => {
+    if(e.target.value != "") {
+      e.preventDefault()
+      const newArray = [...allSteps]
+      newArray.splice(index, 1, e.target.value)
+      setAllSteps(newArray)
+    }
+  }
+
+  const handleIngredientDelete = (e, index) => {
+    const newArray = [...ingredients]
+    newArray.splice(index, 1)
+    setIngredients(newArray)
+    if (!newArray.length && validated || !newArray.length && recipeData) {
+      setIngredientValidation(true)
+    }
+  }
+
+  const handleStepDelete = (e, index) => {
+    const newArray = [...allSteps]
+    newArray.splice(index, 1)
+    setAllSteps(newArray)
+    if (!newArray.length && validated || !newArray.length && recipeData) {
+      setStepsValidation(true)
     }
   }
 
   useEffect(() => {
     return () => {
       if(recipeData) {
-        setRecipeId(recipeData.id)
         setTitle(recipeData.titre)
         setDesc(recipeData.description)
         setLevel(recipeData.niveau)
@@ -81,12 +135,9 @@ export default function RecipeForm({recipeData}) {
         setIngredients(recipeData.ingredients)
         setAllSteps(recipeData.etapes)
         setImage(recipeData.photo)
-      } else if(allRecipes.length) {
-        const lastRecipe = allRecipes[allRecipes.length-1]
-        setRecipeId(lastRecipe.id+1)
       }
     }
-  }, [recipeData, allRecipes])
+  }, [recipeData])
 
   return(
     <Form noValidate validated={validated} onSubmit={(e) => handleSubmit(e)}>
@@ -97,7 +148,6 @@ export default function RecipeForm({recipeData}) {
         value={title}
         required
         onChange={(e) => setTitle(e.target.value)} />
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Description */}
       <FloatingLabel controlId="recipe-description" label="Description" className="mb-3">
@@ -106,7 +156,6 @@ export default function RecipeForm({recipeData}) {
         value={desc}
         required
         onChange={(e) => setDesc(e.target.value)} />
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Level */}
       <FloatingLabel controlId="recipe-level" label="Niveau" className="mb-3">
@@ -121,7 +170,6 @@ export default function RecipeForm({recipeData}) {
           <option value="jedi">Compagnon</option>
           <option value="maitre">Maitre</option>
         </Form.Select>
-        <Form.Control.Feedback type="invalid">Vous devez choisir une des options</Form.Control.Feedback>
       </FloatingLabel>
       {/* People */}
       <FloatingLabel controlId="recipe-people" label="Pour combien de personnes" className="mb-3">
@@ -130,7 +178,6 @@ export default function RecipeForm({recipeData}) {
         required
         value={people}
         onChange={(e) => setPeople(Number(e.target.value))}/>
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </FloatingLabel>
       {/* Time */}
       <InputGroup hasValidation className="mb-3">
@@ -139,10 +186,10 @@ export default function RecipeForm({recipeData}) {
           type="number"
           required
           value={time}
+          className="rounded-0 rounded-start"
           onChange={(e) => setTime(Number(e.target.value))} />
         </FloatingLabel>
         <InputGroup.Text>minutes</InputGroup.Text>
-        <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
       </InputGroup>
       {/* Image */}
       <FloatingLabel controlId="recipe-image" label="Image (optionel)" className="mb-3">
@@ -155,20 +202,14 @@ export default function RecipeForm({recipeData}) {
       <h5>Ingredients</h5>
       <InputGroup className="w-100 mb-3">
         <Row className="mx-0 w-100">
-          <Col xs={"6"} className="px-0">
+          <Col xs={"8"} className="px-0">
             <FloatingLabel controlId="recipe-ingredient-name" label="Ingredient">
               <Form.Control type="text" className="rounded-0 rounded-start" onChange={(e) => setIngredientName(e.target.value)}/>
-              <Form.Control.Feedback type="invalid">Vous devez remplir ce champs</Form.Control.Feedback>
             </FloatingLabel>
           </Col>
           <Col className="px-0">
             <FloatingLabel controlId="recipe-ingredient-quantity" label="Quantité (optionel)">
-              <Form.Control type="number" className="rounded-0" onChange={(e) => setIngredientQuantity(String(e.target.value))}/>
-            </FloatingLabel>
-          </Col>
-          <Col className="px-0">
-            <FloatingLabel controlId="recipe-ingredient-unit" label="Unité (optionel)">
-              <Form.Control type="text" className="rounded-0 rounded-end" onChange={(e) => setIngredientUnit(e.target.value)}/>
+              <Form.Control type="text" className="rounded-0 rounded-end" onChange={(e) => setIngredientQuantity(String(e.target.value))}/>
             </FloatingLabel>
           </Col>
         </Row>
@@ -177,26 +218,50 @@ export default function RecipeForm({recipeData}) {
       {ingredients &&
       ingredients.map((ingredient, index) => {
         return(
-          <p key={index}>{`${ingredient[0]} ${ingredient[1] != '' ? ` - ${ingredient[1]}` : ""}`}</p>
+          <InputGroup key={index} className="w-100 mb-3">
+            <Row className="mx-0 w-100">
+              <Col xs={"7"} className="px-0">
+                <FloatingLabel controlId={`recipe-ingredient-name-${index+1}`} label="Ingredient">
+                  <Form.Control type="text" value={ingredient[0]} className="rounded-0 rounded-start" onChange={(e) => handleIngredientModify(e, index, 0)}/>
+                </FloatingLabel>
+              </Col>
+              <Col xs={"4"} className="px-0">
+                <FloatingLabel controlId={`recipe-ingredient-quantity-${index+1}`} label="Quantité (optionel)">
+                  <Form.Control type="text" value={ingredient[1]} className="rounded-0 rounded-end" onChange={(e) => handleIngredientModify(e, index, 1)} />
+                </FloatingLabel>
+              </Col>
+              <Col xs={"1"} className="d-flex align-items-center">
+                <Button variant="danger" onClick={(e) => handleIngredientDelete(e, index)}>
+                  <FontAwesomeIcon icon={faTrash}/>
+                </Button>
+              </Col>
+            </Row>
+          </InputGroup>
         )
       })}
+      {ingredientValidation && <Form.Control.Feedback className="mb-3 d-block" type="invalid">Vous devez ajouter au moins un ingrédient</Form.Control.Feedback>}
       {/* Steps */}
       <h5>Etapes</h5>
       <Form.Text className="text-muted d-block">Appuyez sur Entrer pour ajouter une étape</Form.Text>
       <InputGroup className="mb-3">
         <InputGroup.Text>{allSteps.length + 1}</InputGroup.Text>
-        <FloatingLabel controlId="recipe-step-add" label="Etape">
-          <Form.Control as={"textarea"} onChange={(e) => setStep(e.target.value)} onKeyDown={(e) => handleStepAdd(e)}/>
-        </FloatingLabel>
+        <Form.Control as={"textarea"} onChange={(e) => setStep(e.target.value)} onKeyDown={(e) => handleStepAdd(e)}/>
       </InputGroup>
       {allSteps &&
         <div className="d-flex flex-column-reverse">
           {allSteps.map((step, index) => {
           return(
-            <p key={index + 1}>{index + 1} - {step}</p>
+            <InputGroup key={index} className="mb-3">
+              <InputGroup.Text>{index + 1}</InputGroup.Text>
+              <Form.Control as={"textarea"} value={step} className="pe-4" onChange={(e) => handleStepModify(e, index)} />
+              <Button variant="danger" onClick={(e) => handleStepDelete(e, index)}>
+                <FontAwesomeIcon icon={faTrash}/>
+              </Button>
+            </InputGroup>
           )})}
         </div>
       }
+      {stepsValidation && <Form.Control.Feedback className="mb-3 d-block" type="invalid">Vous devez ajouter au moins une étape</Form.Control.Feedback>}
       <button type="submit" className="btn btn-primary">Submit test</button>
     </Form>
   )

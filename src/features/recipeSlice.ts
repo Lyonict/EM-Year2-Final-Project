@@ -19,28 +19,27 @@ export const fetchRecipes= createAsyncThunk('recipes/fetchRecipes', async () => 
   return response.data
 })
 
+export const addRecipe = createAsyncThunk('recipes/add', async (recipe) => {
+  return await axios.post("http://localhost:9000/api/recipes", recipe)
+    .then(response => response.data.recette)
+    .catch(error => console.log(error))
+});
+
+export const modifyRecipe = createAsyncThunk('recipes/modify', async (recipe) => {
+  return await axios.put(`http://localhost:9000/api/recipe/${recipe.id}`, recipe)
+    .then(response => response.data.recette)
+    .catch(error => console.log(error))
+})
+
 export const recipeSlice = createSlice({
   name: "recipes",
   initialState,
   reducers: {
-    addRecipe: (state, action) => {
-      state.value.push(action.payload)
-      axios.post("http://localhost:9000/api/recipes", action.payload)
-      .then(response => console.log(response))
-      .catch(error => console.log(error))
-    },
     removeRecipe: (state, action) => {
       const recipeIndex = state.value.findIndex((recipe) => recipe.id === action.payload)
       if(recipeIndex > -1) {
         state.value.splice(recipeIndex, 1)
         axios.delete(`http://localhost:9000/api/recipe/${action.payload}`)
-      }
-    },
-    modifyRecipe: (state, action) => {
-      const recipeIndex = state.value.findIndex((recipe) => recipe.id === action.payload.id)
-      if(recipeIndex > -1) {
-        state.value.splice(recipeIndex, 1, action.payload)
-        axios.put(`http://localhost:9000/api/recipe/${action.payload.id}`, action.payload)
       }
     },
   },
@@ -57,8 +56,18 @@ export const recipeSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message
       })
+      .addCase(addRecipe.fulfilled, (state, action) => {
+        state.value.push(action.payload)
+      })
+      .addCase(modifyRecipe.fulfilled, (state, action) => {
+        state.value.forEach((item, index) => {
+          if(item.id === action.payload.id) {
+            state.value.splice(index, 1, action.payload)
+          }
+        })
+      })
   },
 })
 
-export const { addRecipe, removeRecipe, modifyRecipe } = recipeSlice.actions
+export const { removeRecipe } = recipeSlice.actions
 export default recipeSlice.reducer
